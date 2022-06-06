@@ -1,0 +1,36 @@
+# Before doing this we had to install the ingress-contoller, that had a separate config file, present on the kubernets/ingress-ngnix githuhb repo
+# Applying that config creates a lot of objects
+
+# This config file is for the ngnix routing
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  # annotation is higher level configurations
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # Add use-regex annotation to address certain 404 errors on localhost and Google Cloud
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    # This will rewrite the request before sending the request further
+    # Our rukes below say that if the request comes with "/api", then it will send it to the server pod, but the below line will remove "api"
+    # from the request, before sending it to the server.
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-cluster-ip-service
+                port:
+                  number: 3000
+          - path: /api/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: server-cluster-ip-service
+                port: 
+                  number: 5000

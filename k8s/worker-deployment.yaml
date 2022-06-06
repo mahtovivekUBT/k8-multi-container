@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component: worker
+    spec:
+      containers:
+        - name: worker
+          image: mahtovivek741/multi-worker:v3
+          # Since this pod has to connect with the redis pod, we have to setup the environment variables
+          # which will be set when the containers are created. These environment variables will be used to connect/authenticate other pods
+          env: 
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service      # Thats the name of redis pod
+            - name: REDIS_PORT
+              value: '6379'

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+     # Whenever pod with this template is created, kubernetes will know with "volume", here in this case it has to look for the persistent volume(allocate)
+      volumes:    # `-` actually signifies start of an array
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          # Ok!!! we got the storage from kubernetes, now how would we like to use it in the container.
+          volumeMounts:
+            - name: postgres-storage  # name has to be identical as above in "volume"
+              mountPath: /var/lib/postgresql/data     # Whatever we write in this path will be wriiten to the storage volume on the hardisk
+              subPath: postgres   # A subfolder has to be created for the postrgres, it won't directly write to the volume
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
