@@ -1,0 +1,19 @@
+sudo: required       # because we are making use of docker
+services:
+  # to be pre install as we try to run our build, because we travis build our images and even run the test containers
+  - docker
+before_install:
+  # Following comman, we get after encrypting the service-account.json file through travis CLI, inside ruby docker
+  # Encrypted file is commited to the github, this command will let travis know how to decrypt the file
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+  # The > operator redirects the output usually to a file but it can be to a device
+  # /dev/null is the null device it takes any input you want and throws it away. It can be used to suppress any output.
+  # THis command will download and install googel SDK
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  # Install the kubectl command to manipulate the kubernetes cluster on GCP
+  - glcloud components components update kubectl
+  # Authorization with google cloud
+  # To give access to the GCP Kubernetes we need a activate-service-account and provide key to give access in json file
+  # It is exactly like IAM account we had to create in case of AWS, when we had to give travis access to AWS(programmatically)
+  - gcloud auth activate-service-account --key-file service-account.json
