@@ -16,7 +16,7 @@ before_install:
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
   # Install the kubectl command to manipulate the kubernetes cluster on GCP
-  - glcloud components components update kubectl
+  - glcloud components update kubectl
   # Authorization with google cloud
   # To give access to the GCP Kubernetes we need a activate-service-account and provide key to give access in json file
   # It is exactly like IAM account we had to create in case of AWS, when we had to give travis access to AWS(programmatically)
