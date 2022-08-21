@@ -16,7 +16,7 @@ before_install:
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
   # Install the kubectl command to manipulate the kubernetes cluster on GCP
-  - glcloud components update kubectl
+  - gcloud components update kubectl
   # Authorization with google cloud
   # To give access to the GCP Kubernetes we need a activate-service-account and provide key to give access in json file
   # It is exactly like IAM account we had to create in case of AWS, when we had to give travis access to AWS(programmatically)
@@ -36,7 +36,7 @@ deploy:
   # There is no built in provider for Kubernetes, therefore we have to do it ourselves
   # In case of AWS it was AWSBeanStalk, Travis here knows how to deploy to AWS but doesn't know with Kubernetes
   # Therefore the provider here is a script and in that script we will write the commands which will tell Travis just to run these commands
-  provider: script     
+  provider: script
   script: bash ./deploy.sh     # Just run the command we will take care of deployment
   on:
     branch: master   # Only execute the script, if working on master branch
